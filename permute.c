@@ -6,17 +6,21 @@
 
 /*A linked stack implementation*/
 
-typedef long int    StackEntry;
+typedef long int StackEntry;
+
 typedef struct node {
-  StackEntry      entry;
-  struct node    *next;
-}               Node;
+  StackEntry entry;
+  struct node *next;
+} Node;
+
 typedef struct stack {
-  Node           *top;
-}               Stack;
+  Node *top;
+} Stack;
+
 typedef enum bool {
-  FALSE, TRUE
-}               Boolean;
+  FALSE = 0,
+  TRUE = 1
+} Boolean;
 
 static void     Error(const char *);
 static void     CreateStack(Stack *);
@@ -38,7 +42,7 @@ static void Error(const char *message)
   }
 }
 
-static void CreateStack(Stack * s)
+static void CreateStack(Stack *s)
 {
   if (s == NULL)
 	Error("Stack initialization failed!\n");
@@ -47,7 +51,7 @@ static void CreateStack(Stack * s)
   s->top = NULL;
 }
 
-Boolean StackEmpty(Stack * s)
+Boolean StackEmpty(Stack *s)
 {
   if (s == NULL)
 	Error("Error, Stack is not initialized!\n");
@@ -66,7 +70,7 @@ Node *MakeNode(StackEntry item)
   return np;
 }
 
-static void Push(StackEntry item, Stack * s)
+static void Push(StackEntry item, Stack *s)
 {
   register Node  *np;
   np = MakeNode(item);
@@ -76,7 +80,7 @@ static void Push(StackEntry item, Stack * s)
   s->top = np;
 }
 
-static void Pop(StackEntry * item, Stack * s)
+static void Pop(StackEntry *item, Stack *s)
 {
   register Node  *np;
   if (StackEmpty(s))
@@ -88,14 +92,14 @@ static void Pop(StackEntry * item, Stack * s)
   free(np);
 }
 
-static void ClearStack(Stack * s)
+static void ClearStack(Stack *s)
 {
   static StackEntry item;
   while (!StackEmpty(s))
 	Pop(&item, s);
 }
 
-static void TraverseStack(Stack * s, void (*func_p) (StackEntry item))
+static void TraverseStack(Stack *s, void (*func_p) (StackEntry item))
 {
   register Node  *np;
   if (StackEmpty(s))
@@ -122,10 +126,8 @@ Stack          *BackUp(Stack *);
 void            SendTrain(Stack *, Stack *);
 void            Permute(Stack *, Stack *, Stack *);
 
-
-void Initialize(out, spur, in, ntrains) /* To initialize everything to begin. */
-	 Stack          *out, *spur, *in;
-	 StackEntry      ntrains;
+/* To initialize everything to begin. */
+void Initialize(Stack *out, Stack *spur, Stack *in, StackEntry ntrains)
 {
   CreateStack(out);
   CreateStack(spur);
@@ -137,15 +139,15 @@ void Initialize(out, spur, in, ntrains) /* To initialize everything to begin. */
   }
 }
 
-void PrintEntry(item) /* To print out the entry in a stack. */
-	 StackEntry      item;
+/* To print out the entry in a stack. */
+void PrintEntry(StackEntry item)
 {
   printf("%ld ", item);
   return;
 }
 
-Stack *BackUp(rail) /* To back up a stack for the recursion. */
-  Stack          *rail;
+/* To back up a stack for the recursion. */
+Stack *BackUp(Stack *rail)
 {
   register Node  *np;
   StackEntry      item;
@@ -170,8 +172,7 @@ Stack *BackUp(rail) /* To back up a stack for the recursion. */
   return &backup[bkindex - 1];
 }
 
-void SendTrain(to, from)
-	 Stack          *to, *from;
+void SendTrain(Stack *to, Stack *from)
 {
   StackEntry      entry;
   
@@ -184,10 +185,11 @@ void SendTrain(to, from)
   }
 }
 
-void Permute(out, in, spur)
-	 Stack          *out, *in, *spur;
+void Permute(Stack *out, Stack *in, Stack *spur)
 {
-  Stack          *temp_out, *temp_spur, *temp_in; /* the backups. */
+  Stack *temp_out;
+  Stack *temp_spur;
+  Stack *temp_in; /* the backups. */
 
   if (StackEmpty(out)) {
 	while (!StackEmpty(spur))
