@@ -119,17 +119,21 @@ ClearStack(Stack *s)
 static void
 TraverseStack(Stack *s, void (*func_p) (StackEntry item))
 {
+#ifdef __TRAVERSE__
   register Node  *np;
   
   if (StackEmpty(s)) {
 	Error("Stack empty, operations not executed.\n");
   } else {
 	np = s->top;
+	
 	while (np != NULL) {
 	  func_p(np->entry);
 	  np = np->next;
 	}
+	
   }
+#endif
 }
 
 /* The train permutation program begins here!*/
@@ -225,7 +229,9 @@ Permute(Stack *out, Stack *in, Stack *spur)
 	TraverseStack(in, PrintEntry); /* A mode is detected, */
 	total++;                       /* then print out the results.*/ 
 	ClearStack(in);                /* release the memory. */
+#ifdef __TRAVERSE__
 	printf("\n");
+#endif
   } else {
 
 	if (1 - frame_depth % 2) { /* To decide how to send trains. */
