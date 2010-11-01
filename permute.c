@@ -31,7 +31,8 @@ static void     Pop(StackEntry *, Stack *);
 static void     TraverseStack(Stack *, void (*) (StackEntry));
 
 
-static void Error(const char *message)
+static void
+Error(const char *message)
 {
   if (message == NULL) {
 	printf("Null message! Not printed!\n");
@@ -42,49 +43,63 @@ static void Error(const char *message)
   }
 }
 
-static void CreateStack(Stack *s)
+static void
+CreateStack(Stack *s)
 {
   if (s == NULL)
 	Error("Stack initialization failed!\n");
+  
   if (s->top == NULL)
 	return;
+  
   s->top = NULL;
 }
 
-Boolean StackEmpty(Stack *s)
+Boolean
+StackEmpty(Stack *s)
 {
   if (s == NULL)
 	Error("Error, Stack is not initialized!\n");
+  
   return (s->top == NULL) ? TRUE : FALSE;
 }
 
-Node *MakeNode(StackEntry item)
+Node *
+MakeNode(StackEntry item)
 {
   register Node  *np;
-  if ((np = malloc(sizeof(Node))) == NULL)
+  
+  if ((np = malloc(sizeof(Node))) == NULL) {
 	Error("Error making a node!");
-  else {
+  } else {
 	np->entry = item;
 	np->next = NULL;
   }
+  
   return np;
 }
 
-static void Push(StackEntry item, Stack *s)
+static void
+Push(StackEntry item, Stack *s)
 {
   register Node  *np;
   np = MakeNode(item);
+  
   if (s == NULL)
 	Error("Stack not initialized!\n");
+  
   np->next = s->top;
   s->top = np;
 }
 
-static void Pop(StackEntry *item, Stack *s)
+static void
+Pop(StackEntry *item, Stack *s)
 {
   register Node  *np;
+  
   if (StackEmpty(s))
 	Error("Error popping nodes from an empty stack!\n");
+  
   np = s->top;
   s->top = np->next;
   *item = np->entry;
@@ -92,19 +107,23 @@ static void Pop(StackEntry *item, Stack *s)
   free(np);
 }
 
-static void ClearStack(Stack *s)
+static void
+ClearStack(Stack *s)
 {
   static StackEntry item;
+  
   while (!StackEmpty(s))
 	Pop(&item, s);
 }
 
-static void TraverseStack(Stack *s, void (*func_p) (StackEntry item))
+static void
+TraverseStack(Stack *s, void (*func_p) (StackEntry item))
 {
   register Node  *np;
-  if (StackEmpty(s))
+  
+  if (StackEmpty(s)) {
 	Error("Stack empty, operations not executed.\n");
-  else {
+  } else {
 	np = s->top;
 	while (np != NULL) {
 	  func_p(np->entry);
@@ -127,7 +146,8 @@ void            SendTrain(Stack *, Stack *);
 void            Permute(Stack *, Stack *, Stack *);
 
 /* To initialize everything to begin. */
-void Initialize(Stack *out, Stack *spur, Stack *in, StackEntry ntrains)
+void
+Initialize(Stack *out, Stack *spur, Stack *in, StackEntry ntrains)
 {
   CreateStack(out);
   CreateStack(spur);
@@ -140,14 +160,16 @@ void Initialize(Stack *out, Stack *spur, Stack *in, StackEntry ntrains)
 }
 
 /* To print out the entry in a stack. */
-void PrintEntry(StackEntry item)
+void
+PrintEntry(StackEntry item)
 {
   printf("%ld ", item);
   return;
 }
 
 /* To back up a stack for the recursion. */
-Stack *BackUp(Stack *rail)
+Stack *
+BackUp(Stack *rail)
 {
   register Node  *np;
   StackEntry      item;
@@ -155,8 +177,9 @@ Stack *BackUp(Stack *rail)
   CreateStack(&temp);
   CreateStack(&backup[bkindex]); /* 'backup' is declared as a global.*/
   
-  if (StackEmpty(rail));
-  else {
+  if (StackEmpty(rail)) {
+	;
+  } else {
 	np = rail->top;
 	while (np != NULL) {
 	  Push(np->entry, &temp);
@@ -168,43 +191,49 @@ Stack *BackUp(Stack *rail)
 	  Push(item, &backup[bkindex]);
 	}
   }
+  
   bkindex++;
   return &backup[bkindex - 1];
 }
 
-void SendTrain(Stack *to, Stack *from)
+void
+SendTrain(Stack *to, Stack *from)
 {
   StackEntry      entry;
   
-  if (StackEmpty(from))
+  if (StackEmpty(from)) {
 	Error("No train to be sent!\n");
-  else {
+  } else {
 	Pop(&entry, from);
 	Push(entry, to);
 	return;
   }
 }
 
-void Permute(Stack *out, Stack *in, Stack *spur)
+void
+Permute(Stack *out, Stack *in, Stack *spur)
 {
   Stack *temp_out;
   Stack *temp_spur;
   Stack *temp_in; /* the backups. */
 
   if (StackEmpty(out)) {
+	
 	while (!StackEmpty(spur))
 	  SendTrain(in, spur);
+	
 	TraverseStack(in, PrintEntry); /* A mode is detected, */
 	total++;                       /* then print out the results.*/ 
-	ClearStack(in); /* release the memory. */
+	ClearStack(in);                /* release the memory. */
 	printf("\n");
   } else {
 
-	if (1 - frame_depth % 2) /* To decide how to send trains. */
-	  SendTrain(spur, out); /* If 'frame_depth' is odd, */
-	else                    /* 'out' to 'spur'. If 'frame_depth */
-	  SendTrain(in, spur); /* is even, 'spur' to 'in'. */
-
+	if (1 - frame_depth % 2) { /* To decide how to send trains. */
+	  SendTrain(spur, out);    /* If 'frame_depth' is odd, */
+	} else {                   /* 'out' to 'spur'. If 'frame_depth */
+	  SendTrain(in, spur);     /* is even, 'spur' to 'in'. */
+	}
+	
 	temp_out = BackUp(out);
 	temp_spur = BackUp(spur);
 	temp_in = BackUp(in);
@@ -217,7 +246,8 @@ void Permute(Stack *out, Stack *in, Stack *spur)
   }
 }
 
-int main()
+int
+main()
 {
   Stack           rail_out, rail_in, spur;
   StackEntry      ntrains;
